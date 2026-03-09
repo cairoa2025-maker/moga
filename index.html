@@ -1,534 +1,627 @@
-
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تقرير مستهدف الموجة</title>
+<title>تقرير الموجة 28</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-:root{
-  --bg:#0d1117;--surface:#161b22;--surface2:#1c2128;
-  --border:#30363d;--accent:#3b82f6;--accent2:#60a5fa;
-  --green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--purple:#8b5cf6;
-  --teal:#14b8a6;--text:#e6edf3;--muted:#8b949e;
+:root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --muted: #64748b;
+    --accent: #3b82f6;
+    --green: #16a34a;
+    --red: #dc2626;
+    --yellow: #d97706;
+    --purple: #7c3aed;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;direction:rtl;}
-
-.header{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 60%,#1e293b 100%);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
-.header-icon{width:46px;height:46px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 20px rgba(59,130,246,.35);flex-shrink:0;}
-.header h1{font-size:20px;font-weight:800;}
-.header p{font-size:11px;color:var(--muted);}
-.header-meta{margin-right:auto;text-align:left;}
-.header-date{font-size:11px;color:var(--muted);}
-.online-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:20px;padding:3px 10px;font-size:10px;color:var(--green);margin-top:3px;}
-.dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
-
-.main{padding:22px 28px;max-width:1700px;margin:0 auto;}
-
-/* LOAD PANEL */
-.load-panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px;}
-.load-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.api-url-box{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-.api-url-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--accent2);font-family:monospace;font-size:12px;direction:ltr;min-width:200px;transition:border-color .2s;}
-.api-url-input:focus{outline:none;border-color:var(--accent);}
-.load-hint{font-size:11px;color:var(--muted);margin-top:10px;display:flex;align-items:center;gap:6px;}
-
-/* PANEL */
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px;}
-.panel-title{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:7px;}
-
-/* FILTERS */
-.filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;}
-.fg label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:700;}
-.fg select,.fg input[type=date]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;transition:border-color .2s;appearance:none;}
-.fg select:focus,.fg input:focus{outline:none;border-color:var(--accent);}
-.fg select option{background:var(--surface2);}
-
-/* BUTTONS */
-.btn{padding:9px 17px;border:none;border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;}
-.btn:disabled{opacity:.3;cursor:not-allowed;}
-.btn-primary{background:var(--accent);color:#fff;}
-.btn-primary:hover:not(:disabled){background:#2563eb;transform:translateY(-1px);}
-.btn-green{background:var(--green);color:#fff;}
-.btn-green:hover:not(:disabled){background:#16a34a;transform:translateY(-1px);}
-.btn-yellow{background:var(--yellow);color:#000;}
-.btn-yellow:hover:not(:disabled){background:#d97706;transform:translateY(-1px);}
-.btn-purple{background:var(--purple);color:#fff;}
-.btn-purple:hover:not(:disabled){background:#7c3aed;transform:translateY(-1px);}
-.btn-red{background:var(--red);color:#fff;}
-.btn-red:hover:not(:disabled){background:#dc2626;transform:translateY(-1px);}
-.btns-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
-
-/* STATUS */
-.status-bar{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:9px;min-height:40px;}
-.status-bar.success{border-color:var(--green);color:var(--green);}
-.status-bar.error{border-color:var(--red);color:var(--red);}
-.status-bar.info{border-color:var(--accent);color:var(--accent2);}
-.status-bar.loading{border-color:var(--yellow);color:var(--yellow);}
-.spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px;margin-bottom:16px;}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
-.kpi:hover{transform:translateY(-2px);border-color:var(--accent);}
-.kpi::after{content:'';position:absolute;top:0;right:0;width:45px;height:45px;border-radius:0 12px 0 45px;opacity:.12;}
-.kpi.blue::after{background:var(--accent);}
-.kpi.green::after{background:var(--green);}
-.kpi.red::after{background:var(--red);}
-.kpi.yellow::after{background:var(--yellow);}
-.kpi.purple::after{background:var(--purple);}
-.kpi.teal::after{background:var(--teal);}
-.kpi-lbl{font-size:9px;color:var(--muted);font-weight:700;margin-bottom:5px;}
-.kpi-val{font-size:26px;font-weight:900;line-height:1;}
-.kpi.blue .kpi-val{color:var(--accent2);}
-.kpi.green .kpi-val{color:var(--green);}
-.kpi.red .kpi-val{color:#f87171;}
-.kpi.yellow .kpi-val{color:var(--yellow);}
-.kpi.purple .kpi-val{color:#a78bfa;}
-.kpi.teal .kpi-val{color:#2dd4bf;}
-.kpi-sub{font-size:9px;color:var(--muted);margin-top:3px;}
-
-/* TABLE */
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
-.table-top{padding:13px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
-.table-top h3{font-size:13px;font-weight:700;}
-.tbl-count{font-size:11px;color:var(--muted);}
-.tbl-scroll{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:11px;}
-th{background:#0a0f16;color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;padding:10px 11px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--border);}
-td{padding:9px 11px;text-align:center;border-bottom:1px solid #21262d;white-space:nowrap;}
-tr:hover td{background:var(--surface2);}
-tr:last-child td{border-bottom:none;}
-
-.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
-.b-green{background:rgba(34,197,94,.15);color:var(--green);}
-.b-red{background:rgba(239,68,68,.15);color:#f87171;}
-.b-yellow{background:rgba(245,158,11,.15);color:var(--yellow);}
-.b-blue{background:rgba(59,130,246,.15);color:var(--accent2);}
-.b-purple{background:rgba(139,92,246,.15);color:#a78bfa;}
-.b-teal{background:rgba(20,184,166,.15);color:#2dd4bf;}
-.b-gray{background:rgba(139,148,158,.12);color:var(--muted);}
-
-.pct-wrap{display:inline-flex;align-items:center;gap:5px;}
-.bar-track{width:55px;height:5px;background:var(--border);border-radius:3px;overflow:hidden;display:inline-block;}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:3px;}
-
-.total-row td{background:#1a2744!important;font-weight:800;border-top:2px solid var(--accent);color:#93c5fd;}
-.total-row:hover td{background:#1a2744!important;}
-
-@media print{
-  @page{size:A4 landscape;margin:8mm;}
-  body{background:#fff!important;color:#000!important;}
-  .header,.load-panel,.panel,.status-bar,.kpi-grid{display:none!important;}
-  .table-wrap{border:none;}
-  .table-top{display:none!important;}
-  table{font-size:8pt;}
-  th{background:#1e3a8a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  td{border:1px solid #ccc!important;color:#000!important;}
-  .total-row td{background:#dbeafe!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-  .badge{border:1px solid #999;background:transparent!important;color:#000!important;}
-  .bar-track{display:none;}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    line-height: 1.5;
 }
-@media(max-width:768px){.main{padding:12px;}.kpi-val{font-size:20px;}.api-url-box{flex-direction:column;}}
+.header {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-icon {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: white;
+}
+.header h1 { font-size: 20px; font-weight: 800; }
+.header p { font-size: 11px; color: var(--muted); }
+.header-meta { margin-right: auto; }
+.header-date { font-size: 11px; color: var(--muted); }
+.main { padding: 22px 28px; max-width: 1900px; margin: 0 auto; }
+.load-panel, .filter-panel, .table-wrap, .status-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.load-panel { padding: 24px; margin-bottom: 16px; }
+.load-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+.api-url-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-family: monospace;
+    font-size: 12px;
+    direction: ltr;
+    min-width: 200px;
+}
+.api-url-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+}
+.btn {
+    padding: 9px 17px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn:disabled { opacity: .3; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: #2563eb; }
+.btn-green { background: var(--green); color: white; }
+.btn-green:hover { background: #15803d; }
+.btn-purple { background: var(--purple); color: white; }
+.btn-purple:hover { background: #6d28d9; }
+.btn-red { background: var(--red); color: white; }
+.btn-red:hover { background: #b91c1c; }
+.btn-orange { background: #f97316; color: white; }
+.btn-orange:hover { background: #ea580c; }
+.status-bar {
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+.status-bar.success { border-left: 4px solid var(--green); color: #166534; background: #f0fdf4; }
+.status-bar.error { border-left: 4px solid var(--red); color: #991b1b; background: #fef2f2; }
+.status-bar.info { border-left: 4px solid var(--accent); color: #1e40af; background: #eff6ff; }
+.status-bar.loading { border-left: 4px solid var(--yellow); color: #92400e; background: #fefce8; }
+.filter-panel {
+    padding: 14px 20px;
+    margin-bottom: 14px;
+    display: none;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.filter-panel.show { display: flex; }
+.filter-label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.prop-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.prop-btn {
+    padding: 8px 18px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+}
+.prop-btn:hover { border-color: var(--accent); background: #eff6ff; }
+.prop-btn.act-all { border-color: var(--accent); background: #eff6ff; color: var(--accent); }
+.prop-btn.act-priv { border-color: var(--green); background: #f0fdf4; color: var(--green); }
+.prop-btn.act-govt { border-color: var(--purple); background: #f3e8ff; color: var(--purple); }
+.table-wrap { overflow: hidden; margin-bottom: 16px; }
+.table-top {
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.tbl-scroll { overflow-x: auto; }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    font-weight: 600;
+}
+th, td {
+    padding: 7px 9px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+.th1 { background: #eff6ff; color: #1e40af; font-size: 10px; font-weight: 900; }
+.th2 { background: #dbeafe; color: #1e40af; font-size: 9.5px; font-weight: 800; }
+.tr-d td { background: #ffffff; }
+.tr-d:nth-child(even) td { background: #f8fafc; }
+.tr-d:hover td { background: #f1f5f9; }
+.tr-r td {
+    background: #e0f2fe !important;
+    color: #1e40af !important;
+    font-weight: 900 !important;
+    border-top: 2px solid #60a5fa !important;
+}
+.tr-g td {
+    background: #bfdbfe !important;
+    color: #1e40af !important;
+    font-weight: 900 !important;
+    font-size: 12px;
+    border-top: 3px solid #3b82f6 !important;
+}
+.td-n { text-align: right !important; font-weight: 800 !important; padding-right: 14px !important; }
+.td-nr { text-align: right !important; font-weight: 900 !important; padding-right: 14px !important; }
+.ctg { color: #1e40af; } .cdn { color: #166534; } .cpv { color: #854d0e; }
+.cfl { color: #991b1b; } .cnn { color: #6b7280; } .cwl { color: #5b21b6; }
+.ctw { color: #059669; } .cts { color: #7c3aed; } .crm { color: #c2410c; }
+.z { color: #6b7280 !important; font-weight: 700 !important; }
+.no-jpg-export { display: block; }
+.jpg-export-hidden { display: none !important; }
+.jpg-export-black-bold td,
+.jpg-export-black-bold th,
+.jpg-export-black-bold .td-n,
+.jpg-export-black-bold .td-nr,
+.jpg-export-black-bold .tr-r td,
+.jpg-export-black-bold .tr-g td {
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 1mm;
+    }
+    body {
+        background: white !important;
+        color: black !important;
+        font-size: 7pt !important;
+    }
+    .header, .load-panel, .filter-panel, .status-bar, .table-top button {
+        display: none !important;
+    }
+    .main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+    }
+    .table-wrap, .tbl-scroll {
+        overflow: visible !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid-page !important;
+    }
+    table {
+        width: 100%;
+        font-size: 8.5pt !important;
+        page-break-inside: avoid !important;
+    }
+    th, td {
+        border: 1px solid #777 !important;
+        padding: 3px 4px !important;
+        font-size: 7pt !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+        color: black !important;
+        font-weight: bold !important;
+    }
+    .table-top {
+        border-bottom: none !important;
+        margin-bottom: 8px;
+    }
+    .tr-g td {
+        font-size: 10pt !important;
+    }
+}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="header-icon"><i class="fas fa-map-marked-alt"></i></div>
-  <div>
-    <h1>تقرير مستهدف الموجة</h1>
-    <p>متصل بـ Google Sheets عبر Apps Script API</p>
-  </div>
-  <div class="header-meta">
-    <div class="header-date" id="hDate"></div>
-    <div class="online-badge" id="onlineBadge" style="display:none">
-      <div class="dot"></div> متصل بالشيت
+    <div class="header-icon"><i class="fas fa-city"></i></div>
+    <div>
+        <h1>تقرير الموجة 28</h1>
+        <p>ملخص بالمناطق والأحياء — أملاك خاصة / أملاك دولة</p>
     </div>
-  </div>
+    <div class="header-meta">
+        <div class="header-date" id="hDate"></div>
+        <div class="online-badge" id="onlineBadge" style="display:none">
+            <div class="dot"></div> متصل بالشيت
+        </div>
+    </div>
 </div>
-
 <div class="main">
-
-  <!-- LOAD PANEL -->
-  <div class="load-panel">
-    <div class="load-title"><i class="fas fa-plug"></i> اتصال بـ Google Sheets API</div>
-    <div class="api-url-box">
-      <input class="api-url-input" type="text" id="apiUrl"
-        value="https://script.google.com/macros/s/AKfycbxfCxpbbvqf_pox62_AjiDZjg9RKnRwUkC7RJ5XoOQXvkGyz16HVQ-ajFdlEiNkufDnDA/exec"
-        placeholder="رابط Apps Script Web App">
-      <button class="btn btn-primary" onclick="loadData()">
-        <i class="fas fa-cloud-download-alt"></i> تحميل البيانات
-      </button>
-      <button class="btn btn-purple" id="refreshBtn" onclick="loadData()" disabled>
-        <i class="fas fa-sync-alt"></i> تحديث
-      </button>
+    <div class="load-panel">
+        <div class="load-title"><i class="fas fa-plug"></i> اتصال بـ Google Sheets API</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <input class="api-url-input" type="text" id="apiUrl"
+                value="https://script.google.com/macros/s/AKfycbzCis7BfG4D8ZL3Uu9Tg4ykXGZ0OVz73fdT3nHvPgDRwmLuiE7FN-wImGDFGGXnYbs0QA/exec"
+                placeholder="رابط Apps Script Web App">
+            <button class="btn btn-primary" onclick="loadData()">
+                <i class="fas fa-cloud-download-alt"></i> تحميل البيانات
+            </button>
+            <button class="btn btn-purple" id="refreshBtn" onclick="loadData()" disabled>
+                <i class="fas fa-sync-alt"></i> تحديث
+            </button>
+        </div>
     </div>
-    <div class="load-hint">
-      <i class="fas fa-check-circle" style="color:var(--green)"></i>
-      الرابط جاهز — اضغط "تحميل البيانات" (يعمل عند فتح الصفحة من سيرفر أو أونلاين)
+    <div class="status-bar info" id="statusBar">
+        <i class="fas fa-info-circle"></i>
+        <span>اضغط "تحميل البيانات" للاتصال بـ Google Sheets مباشرة</span>
     </div>
-  </div>
-
-  <!-- STATUS -->
-  <div class="status-bar info" id="statusBar">
-    <i class="fas fa-info-circle"></i>
-    <span id="statusText">اضغط "تحميل البيانات" للاتصال بـ Google Sheets مباشرة</span>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="panel" id="filtersPanel" style="display:none">
-    <div class="panel-title"><i class="fas fa-filter"></i> الفلاتر</div>
-    <div class="filters-grid">
-      <div class="fg"><label>📅 تاريخ البداية</label><input type="date" id="startDate"></div>
-      <div class="fg"><label>📅 تاريخ النهاية</label><input type="date" id="endDate"></div>
-      <div class="fg"><label>🏢 المركز</label><select id="centerFilter"><option value="">— كل المراكز —</option></select></div>
-      <div class="fg"><label>📋 حالة المتغير</label><select id="statusFilter"><option value="">— الكل —</option></select></div>
-      <div class="fg">
-        <label>🏷️ تصنيف الحالة</label>
-        <select id="classifFilter">
-          <option value="">— الكل —</option>
-          <option>سهلة</option><option>متوسطة</option><option>صعبة</option>
-        </select>
-      </div>
-      <div class="fg">
-        <label>📆 الأسبوع</label>
-        <select id="weekFilter">
-          <option value="">— الكل —</option>
-          <option>الاول</option><option>الثاني</option>
-        </select>
-      </div>
-      <div class="fg"><label>🏠 نوع الأملاك</label><select id="propFilter"><option value="">— الكل —</option></select></div>
-      <div class="fg">
-        <label>✅ الوزارة</label>
-        <select id="wazaraFilter">
-          <option value="">— الكل —</option>
-          <option value="تم">تم ✓</option>
-          <option value="__EMPTY__">لم يتم</option>
-        </select>
-      </div>
+    <div class="filter-panel" id="filterPanel">
+        <span class="filter-label"><i class="fas fa-filter" style="margin-left:6px;color:var(--accent)"></i>عرض حسب نوع الأملاك:</span>
+        <div class="prop-btns">
+            <button class="prop-btn act-all" id="btnAll" onclick="setFilter('all')">
+                <i class="fas fa-layer-group"></i> الكل
+            </button>
+            <button class="prop-btn" id="btnPriv" onclick="setFilter('priv')">
+                <i class="fas fa-home"></i> خاصة فقط
+            </button>
+            <button class="prop-btn" id="btnGovt" onclick="setFilter('govt')">
+                <i class="fas fa-landmark"></i> دولة فقط
+            </button>
+        </div>
     </div>
-    <div class="btns-row">
-      <button class="btn btn-primary" id="reportBtn" onclick="generateReport()" disabled>
-        <i class="fas fa-chart-bar"></i> عرض التقرير
-      </button>
-      <button class="btn btn-green" id="exportSBtn" onclick="exportSummary()" disabled>
-        <i class="fas fa-file-excel"></i> تصدير الملخص
-      </button>
-      <button class="btn btn-yellow" id="exportDBtn" onclick="exportDetailed()" disabled>
-        <i class="fas fa-table"></i> تصدير تفصيلي
-      </button>
-      <button class="btn btn-purple" id="exportKBtn" onclick="exportKML()" disabled>
-        <i class="fas fa-globe"></i> تصدير KML
-      </button>
-      <button class="btn btn-red" id="printBtn" onclick="window.print()" disabled>
-        <i class="fas fa-print"></i> طباعة
-      </button>
+    <div class="table-wrap" id="tableWrap" style="display:none">
+        <div class="table-top no-jpg-export">
+            <h3 id="tableTitle"><i class="fas fa-table" style="margin-left:8px;color:var(--accent)"></i>تقرير الموجة 28 — ملخص بالمناطق والأحياء</h3>
+            <div style="display:flex;gap:8px">
+                <button class="btn btn-green" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Excel (ملخص)</button>
+                <button class="btn btn-green" onclick="exportDetailedExcel()"><i class="fas fa-file-excel"></i> Excel (تفصيلي)</button>
+                <button class="btn btn-orange" onclick="exportAsJPG()"><i class="fas fa-file-image"></i> تصدير JPG</button>
+                <button class="btn btn-red" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
+            </div>
+        </div>
+        <div class="tbl-scroll">
+            <table id="reportTable">
+                <thead id="reportHead"></thead>
+                <tbody id="reportBody"></tbody>
+            </table>
+        </div>
     </div>
-  </div>
-
-  <!-- KPI -->
-  <div class="kpi-grid" id="kpiGrid" style="display:none">
-    <div class="kpi blue"><div class="kpi-lbl">إجمالي السجلات</div><div class="kpi-val" id="kT">0</div><div class="kpi-sub" id="kTs"></div></div>
-    <div class="kpi green"><div class="kpi-lbl">تمت الإزالة كليا</div><div class="kpi-val" id="kF">0</div><div class="kpi-sub" id="kFp"></div></div>
-    <div class="kpi teal"><div class="kpi-lbl">تمت الإزالة جزئيا</div><div class="kpi-val" id="kP">0</div><div class="kpi-sub" id="kPp"></div></div>
-    <div class="kpi red"><div class="kpi-lbl">تعذر الإزالة</div><div class="kpi-val" id="kE">0</div><div class="kpi-sub" id="kEp"></div></div>
-    <div class="kpi yellow"><div class="kpi-lbl">تمت الإزالة سابقاً</div><div class="kpi-val" id="kPr">0</div><div class="kpi-sub" id="kPrp"></div></div>
-    <div class="kpi purple"><div class="kpi-lbl">حالات أخرى</div><div class="kpi-val" id="kO">0</div><div class="kpi-sub" id="kOp"></div></div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="table-wrap" id="tableWrap" style="display:none">
-    <div class="table-top">
-      <h3><i class="fas fa-table" style="margin-left:8px;color:var(--accent)"></i>ملخص بالمراكز</h3>
-      <span class="tbl-count" id="tblCount"></span>
-    </div>
-    <div class="tbl-scroll">
-      <table id="summaryTable">
-        <thead>
-          <tr>
-            <th>#</th><th>المركز</th><th>الإجمالي</th>
-            <th>تمت كليا</th><th>تمت جزئيا</th><th>تعذر</th>
-            <th>سابقا</th><th>تصالح</th><th>تطوير</th>
-            <th>جهة ولاية</th><th>لا يحتاج</th>
-            <th>نسبة الإنجاز</th>
-            <th>سهلة</th><th>متوسطة</th><th>صعبة</th>
-            <th>الوزارة ✓</th>
-          </tr>
-        </thead>
-        <tbody id="summaryBody"></tbody>
-      </table>
-    </div>
-  </div>
-
 </div>
 
 <script>
-// ── STATE ──
-let allRows = [], filteredRows = [];
+const STRUCTURE = {
+    'الجنوبية': ['حى البساتين','حى التبين','حى الخليفه','حى السيده زينب','حى المعادى','حى المعصره','حى المقطم','حى حلوان','حى دار السلام','حى طره','حى مصر القديمه','حى 15 مايو'],
+    'الشرقية': ['حى النزهه','حى شرق مدينه نصر','حى غرب مدينه نصر','حى المرج','حى المطريه','حى اول السلام','حى مصر الجديده','حى ثان السلام','حى عين شمس'],
+    'الشمالية': ['حى الاميريه','حى الزاويه الحمراء','حى الزيتون','حى الساحل','حى الشرابيه','حى حدائق القبه','حى روض الفرج','حى شبرا'],
+    'الغربية': ['حى الازبكيه','حى الموسكى','حى الوايلى','حى باب الشعريه','حى بولاق','حى عابدين','حى وسط','حى غرب','حى منشاه ناصر'],
+};
+const DONE = ['تمت الازالة جزئيا في الموجة','تمت الازالة كليا في الموجة'];
+const PREV = ['تمت الازالة سابقا'];
+const FAIL = ['تعذر الازالة'];
+const NONO = ['لا يحتاج الي ازالة'];
+const WILA = ['جهة ولاية'];
+const TATW = ['تطوير'];
+const TASA = ['تصالح'];
+const PRIV = 'أملاك خاصة';
+const GOVT = 'أملاك دولة';
+let allRows = [];
+let currentFilter = 'all';
 
-// ── INIT ──
-document.getElementById('hDate').textContent =
-  new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('hDate').textContent = new Date().toLocaleDateString('ar-EG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
-// auto-load if URL is already set (when opened online)
 window.addEventListener('load', () => {
-  const url = document.getElementById('apiUrl').value.trim();
-  if (url && url.includes('script.google.com')) {
-    setTimeout(loadData, 500);
-  }
+    const u = document.getElementById('apiUrl').value.trim();
+    if (u.includes('script.google.com')) setTimeout(loadData, 800);
 });
 
-// ── LOAD DATA FROM APPS SCRIPT ──
 async function loadData() {
-  const url = document.getElementById('apiUrl').value.trim();
-  if (!url) return setStatus('أدخل رابط API أولاً','error');
-
-  setStatus('<div class="spinner"></div> جاري الاتصال بـ Google Sheets...','loading');
-  document.getElementById('refreshBtn').disabled = true;
-
-  try {
-    const resp = await fetch(url, { redirect: 'follow', mode: 'cors' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-
-    const json = await resp.json();
-
-    // Apps Script returns { data: [...] }
-    const rows = json.data || json;
-    if (!Array.isArray(rows) || rows.length === 0)
-      throw new Error('لا توجد بيانات في الشيت');
-
-    // normalize keys (trim whitespace)
-    allRows = rows.map(r => {
-      const n = {};
-      Object.keys(r).forEach(k => { n[k.trim()] = String(r[k] ?? '').trim(); });
-      return n;
-    }).filter(r => Object.values(r).some(v => v !== ''));
-
-    populateFilters();
-
-    document.getElementById('onlineBadge').style.display = 'inline-flex';
-    document.getElementById('refreshBtn').disabled = false;
-    document.getElementById('filtersPanel').style.display = 'block';
-    document.getElementById('reportBtn').disabled = false;
-
-    setStatus(
-      `<i class="fas fa-check-circle"></i> تم تحميل <strong>${allRows.length.toLocaleString('ar')}</strong> سجل من Google Sheets بنجاح ✓`,
-      'success'
-    );
-
-  } catch(e) {
-    setStatus(
-      `<i class="fas fa-exclamation-circle"></i> ${e.message}`,
-      'error'
-    );
-    document.getElementById('refreshBtn').disabled = false;
-  }
-}
-
-// ── POPULATE FILTERS ──
-function populateFilters() {
-  const uniq = key => [...new Set(allRows.map(r=>(r[key]||'').trim()))].filter(Boolean).sort();
-  fillSel('centerFilter', uniq('المركز'));
-  fillSel('statusFilter', uniq('حالة المتغير فى الموجة'));
-  fillSel('propFilter',   uniq('نوع الاملاك'));
-}
-
-function fillSel(id, items) {
-  const s = document.getElementById(id), f = s.options[0];
-  s.innerHTML = ''; s.appendChild(f);
-  items.forEach(v => { const o=document.createElement('option'); o.value=o.textContent=v; s.appendChild(o); });
-}
-
-// ── GENERATE REPORT ──
-function generateReport() {
-  const sd = document.getElementById('startDate').value;
-  const ed = document.getElementById('endDate').value;
-  const ce = document.getElementById('centerFilter').value;
-  const st = document.getElementById('statusFilter').value;
-  const cl = document.getElementById('classifFilter').value;
-  const wk = document.getElementById('weekFilter').value;
-  const pr = document.getElementById('propFilter').value;
-  const wz = document.getElementById('wazaraFilter').value;
-
-  filteredRows = allRows.filter(r => {
-    if (sd||ed) {
-      const raw = r['تاريخ التقرير']||''; if(!raw) return false;
-      const d = new Date(raw); if(isNaN(d)) return false;
-      const ds = d.toISOString().split('T')[0];
-      if(sd && ds<sd) return false;
-      if(ed && ds>ed) return false;
+    const url = document.getElementById('apiUrl').value.trim();
+    if (!url) return setStatus('أدخل رابط API صحيح', 'error');
+    setStatus('<div class="spinner"></div> جاري الاتصال بـ Google Sheets...', 'loading');
+    document.getElementById('refreshBtn').disabled = true;
+    try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const json = await resp.json();
+        const rows = json.data || json || [];
+        if (!Array.isArray(rows) || rows.length === 0) {
+            throw new Error('لا توجد بيانات صالحة في الرد');
+        }
+        allRows = rows.map(r => {
+            const n = {};
+            Object.keys(r).forEach(k => { n[k.trim()] = String(r[k] ?? '').trim(); });
+            return n;
+        }).filter(r => Object.values(r).some(v => v !== ''));
+        document.getElementById('onlineBadge').style.display = 'inline-flex';
+        document.getElementById('refreshBtn').disabled = false;
+        document.getElementById('filterPanel').classList.add('show');
+        buildHeader();
+        renderReport();
+        setStatus(`<i class="fas fa-check-circle"></i> تم تحميل <strong>${allRows.length.toLocaleString('ar')}</strong> سجل ✓`, 'success');
+    } catch (e) {
+        setStatus(`<i class="fas fa-exclamation-circle"></i> ${e.message}`, 'error');
+        document.getElementById('refreshBtn').disabled = false;
     }
-    if(ce && (r['المركز']||'').trim()!==ce) return false;
-    if(st && hs(r)!==st) return false;
-    if(cl && (r['تصنيف الحالة']||'').trim()!==cl) return false;
-    if(wk && (r['الاسبوع']||'').trim()!==wk) return false;
-    if(pr && (r['نوع الاملاك']||'').trim()!==pr) return false;
-    if(wz==='تم'       && (r['الوزارة']||'').trim()!=='تم') return false;
-    if(wz==='__EMPTY__'&& (r['الوزارة']||'').trim()==='تم') return false;
-    return true;
-  });
-
-  if (!filteredRows.length) {
-    setStatus('<i class="fas fa-search"></i> لا توجد سجلات تطابق الفلاتر','info');
-    document.getElementById('kpiGrid').style.display='none';
-    document.getElementById('tableWrap').style.display='none';
-    return;
-  }
-
-  renderKPIs();
-  renderTable();
-  ['exportSBtn','exportDBtn','exportKBtn','printBtn'].forEach(id=>document.getElementById(id).disabled=false);
-  const nCenters = Object.keys(groupBy(filteredRows,'المركز')).length;
-  setStatus(
-    `<i class="fas fa-check-circle"></i> تم إنشاء التقرير — <strong>${filteredRows.length.toLocaleString('ar')}</strong> سجل في <strong>${nCenters}</strong> مركز`,
-    'success'
-  );
 }
 
-// ── KPIs ──
-function renderKPIs() {
-  const t    = filteredRows.length;
-  const full = filteredRows.filter(r=>hs(r).includes('كليا')).length;
-  const part = filteredRows.filter(r=>hs(r).includes('جزئيا')).length;
-  const fail = filteredRows.filter(r=>hs(r).includes('تعذر')).length;
-  const prev = filteredRows.filter(r=>hs(r).includes('سابقا')).length;
-  const other= t-full-part-fail-prev;
-  const p    = n=>t>0?(n/t*100).toFixed(1)+'%':'0%';
-  S('kT',t.toLocaleString('ar'));   S('kTs','إجمالي السجلات');
-  S('kF',full.toLocaleString('ar'));  S('kFp',p(full));
-  S('kP',part.toLocaleString('ar')); S('kPp',p(part));
-  S('kE',fail.toLocaleString('ar')); S('kEp',p(fail));
-  S('kPr',prev.toLocaleString('ar'));S('kPrp',p(prev));
-  S('kO',other.toLocaleString('ar'));S('kOp',p(other));
-  document.getElementById('kpiGrid').style.display='grid';
+function getVisibleCols() {
+    if (currentFilter === 'priv') {
+        return [
+            {m:'المستهدف', s:'أملاك خاصة', c:'ctg', p:'cp'},
+            {m:'ما تم في الموجة 28', s:'أملاك خاصة', c:'cdn', p:'cp'},
+            {m:'تمت الإزالة سابقاً', s:'أملاك خاصة', c:'cpv', p:'cp'},
+            {m:'تعذر الإزالة', s:'أملاك خاصة', c:'cfl', p:'cp'},
+            {m:'لايحتاج إزالة', s:'أملاك خاصة', c:'cnn', p:'cp'},
+            {m:'جهة ولاية', s:'أملاك خاصة', c:'cwl', p:'cp'},
+            {m:'تطوير', s:'', c:'ctw', p:'ct'},
+            {m:'تصالح', s:'', c:'cts', p:'ct'},
+            {m:'المتبقي', s:'أملاك خاصة', c:'crm', p:'cp'},
+        ];
+    }
+    if (currentFilter === 'govt') {
+        return [
+            {m:'المستهدف', s:'أملاك دولة', c:'ctg', p:'cg'},
+            {m:'ما تم في الموجة 28', s:'أملاك دولة', c:'cdn', p:'cg'},
+            {m:'تمت الإزالة سابقاً', s:'أملاك دولة', c:'cpv', p:'cg'},
+            {m:'تعذر الإزالة', s:'أملاك دولة', c:'cfl', p:'cg'},
+            {m:'لايحتاج إزالة', s:'أملاك دولة', c:'cnn', p:'cg'},
+            {m:'جهة ولاية', s:'أملاك دولة', c:'cwl', p:'cg'},
+            {m:'تطوير', s:'', c:'ctw', p:'ct'},
+            {m:'تصالح', s:'', c:'cts', p:'ct'},
+            {m:'المتبقي', s:'أملاك دولة', c:'crm', p:'cg'},
+        ];
+    }
+    return [
+        {m:'المستهدف', s:'أملاك خاصة', c:'ctg', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'ctg', p:'cg'},
+        {m:'', s:'إجمالي', c:'ctg', p:'ct'},
+        {m:'ما تم في الموجة 28', s:'أملاك خاصة', c:'cdn', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'cdn', p:'cg'},
+        {m:'', s:'إجمالي', c:'cdn', p:'ct'},
+        {m:'تمت الإزالة سابقاً', s:'أملاك خاصة', c:'cpv', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'cpv', p:'cg'},
+        {m:'', s:'إجمالي', c:'cpv', p:'ct'},
+        {m:'تعذر الإزالة', s:'أملاك خاصة', c:'cfl', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'cfl', p:'cg'},
+        {m:'', s:'إجمالي', c:'cfl', p:'ct'},
+        {m:'لايحتاج إزالة', s:'أملاك خاصة', c:'cnn', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'cnn', p:'cg'},
+        {m:'', s:'إجمالي', c:'cnn', p:'ct'},
+        {m:'جهة ولاية', s:'أملاك خاصة', c:'cwl', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'cwl', p:'cg'},
+        {m:'', s:'إجمالي', c:'cwl', p:'ct'},
+        {m:'تطوير', s:'', c:'ctw', p:'ct'},
+        {m:'تصالح', s:'', c:'cts', p:'ct'},
+        {m:'المتبقي', s:'أملاك خاصة', c:'crm', p:'cp'},
+        {m:'', s:'أملاك دولة', c:'crm', p:'cg'},
+        {m:'', s:'إجمالي', c:'crm', p:'ct'},
+    ];
 }
 
-// ── TABLE ──
-function renderTable() {
-  const tbody = document.getElementById('summaryBody');
-  tbody.innerHTML = '';
-  const g = groupBy(filteredRows,'المركز');
-  let G={t:0,f:0,p:0,e:0,pr:0,ts:0,tw:0,wl:0,nn:0,sh:0,mt:0,s3:0,wz:0};
-
-  const rows = Object.entries(g).map(([center,recs])=>{
-    const t  = recs.length;
-    const f  = recs.filter(r=>hs(r).includes('كليا')).length;
-    const p  = recs.filter(r=>hs(r).includes('جزئيا')).length;
-    const e  = recs.filter(r=>hs(r).includes('تعذر')).length;
-    const pr = recs.filter(r=>hs(r).includes('سابقا')).length;
-    const ts = recs.filter(r=>hs(r)==='تصالح').length;
-    const tw = recs.filter(r=>hs(r)==='تطوير').length;
-    const wl = recs.filter(r=>hs(r)==='جهة ولاية').length;
-    const nn = recs.filter(r=>hs(r).includes('لا يحتاج')).length;
-    const sh = recs.filter(r=>(r['تصنيف الحالة']||'').trim()==='سهلة').length;
-    const mt = recs.filter(r=>(r['تصنيف الحالة']||'').trim()==='متوسطة').length;
-    const s3 = recs.filter(r=>(r['تصنيف الحالة']||'').trim()==='صعبة').length;
-    const wz = recs.filter(r=>(r['الوزارة']||'').trim()==='تم').length;
-    const done=f+p+pr; const pct=t>0?(done/t*100).toFixed(1):0;
-    G.t+=t;G.f+=f;G.p+=p;G.e+=e;G.pr+=pr;G.ts+=ts;G.tw+=tw;G.wl+=wl;G.nn+=nn;G.sh+=sh;G.mt+=mt;G.s3+=s3;G.wz+=wz;
-    return {center,t,f,p,e,pr,ts,tw,wl,nn,sh,mt,s3,wz,pct:parseFloat(pct)};
-  });
-
-  rows.sort((a,b)=>b.pct-a.pct);
-
-  rows.forEach((d,i)=>{
-    const col = d.pct>=70?'var(--green)':d.pct>=40?'var(--yellow)':'var(--red)';
-    const tr  = document.createElement('tr');
-    tr.innerHTML=`
-      <td style="color:var(--muted)">${i+1}</td>
-      <td style="text-align:right;font-weight:700">${d.center}</td>
-      <td><span class="badge b-blue">${d.t}</span></td>
-      <td><span class="badge b-green">${d.f}</span></td>
-      <td><span class="badge b-teal">${d.p}</span></td>
-      <td><span class="badge b-red">${d.e}</span></td>
-      <td><span class="badge b-gray">${d.pr}</span></td>
-      <td><span class="badge b-purple">${d.ts}</span></td>
-      <td><span class="badge b-yellow">${d.tw}</span></td>
-      <td><span class="badge b-gray">${d.wl}</span></td>
-      <td><span class="badge b-gray">${d.nn}</span></td>
-      <td>
-        <div class="pct-wrap">
-          <div class="bar-track"><div class="bar-fill" style="width:${d.pct}%"></div></div>
-          <span style="font-weight:800;color:${col}">${d.pct}%</span>
-        </div>
-      </td>
-      <td><span class="badge b-green">${d.sh}</span></td>
-      <td><span class="badge b-yellow">${d.mt}</span></td>
-      <td><span class="badge b-red">${d.s3}</span></td>
-      <td style="font-weight:700;color:var(--green)">${d.wz}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  const gd=G.f+G.p+G.pr; const gp=G.t>0?(gd/G.t*100).toFixed(1):0;
-  const tot=document.createElement('tr'); tot.className='total-row';
-  tot.innerHTML=`
-    <td colspan="2" style="text-align:right">الإجمالي الكلي</td>
-    <td>${G.t}</td><td>${G.f}</td><td>${G.p}</td><td>${G.e}</td>
-    <td>${G.pr}</td><td>${G.ts}</td><td>${G.tw}</td><td>${G.wl}</td><td>${G.nn}</td>
-    <td>${gp}%</td>
-    <td>${G.sh}</td><td>${G.mt}</td><td>${G.s3}</td><td>${G.wz}</td>`;
-  tbody.appendChild(tot);
-
-  document.getElementById('tblCount').textContent=`${rows.length} مركز`;
-  document.getElementById('tableWrap').style.display='block';
-}
-
-// ── EXPORTS ──
-function exportSummary(){
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.table_to_sheet(document.getElementById('summaryTable'));
-  XLSX.utils.book_append_sheet(wb,ws,'الملخص');
-  XLSX.writeFile(wb,`ملخص_مستهدف_الموجة_${td()}.xlsx`);
-}
-
-function exportDetailed(){
-  if(!filteredRows.length)return;
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.json_to_sheet(filteredRows);
-  XLSX.utils.book_append_sheet(wb,ws,'تفصيلي');
-  XLSX.writeFile(wb,`تفصيلي_مستهدف_الموجة_${td()}.xlsx`);
-}
-
-function exportKML(){
-  if(!filteredRows.length)return;
-  const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-  let kml=`<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document>\n<n>مستهدف الموجة</n>\n<Style id="s"><IconStyle><color>ff0055ff</color><scale>1.1</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href></Icon></IconStyle></Style>\n<Folder><n>النقاط</n>`;
-  let cnt=0;
-  filteredRows.forEach((r,i)=>{
-    let lat,lon;
-    const map=(r['map']||'').trim();
-    if(map&&map.includes(',')){const pts=map.split(',');lat=parseFloat(pts[0]);lon=parseFloat(pts[1]);}
-    else{lat=parseFloat((r['دائره العرض']||'').replace(/,/g,'.'));lon=parseFloat((r['خط الطول']||'').replace(/,/g,'.'));}
-    if(isNaN(lat)||isNaN(lon))return;
-    cnt++;
-    kml+=`\n<Placemark><n>${esc(r['كود المتغير']||`نقطة ${i+1}`)}</n><styleUrl>#s</styleUrl><Point><coordinates>${lon},${lat},0</coordinates></Point><ExtendedData>`;
-    ['المركز','الشياخه','نوع المتغير','نوع الاملاك','حالة المتغير فى الموجة','تصنيف الحالة','ملاحظة المركز'].forEach(k=>{
-      const v=esc(r[k]||''); if(v) kml+=`<Data name="${k}"><value>${v}</value></Data>`;
+function buildHeader() {
+    const visibleCols = getVisibleCols();
+    const thead = document.getElementById('reportHead');
+    thead.innerHTML = '';
+    const tr1 = document.createElement('tr');
+    tr1.innerHTML = '<th class="th1" rowspan="2" style="min-width:120px">الأحياء</th>';
+    let i = 0;
+    while (i < visibleCols.length) {
+        const col = visibleCols[i];
+        if (!col.m) { i++; continue; }
+        let span = 1;
+        while (i + span < visibleCols.length && !visibleCols[i + span].m) span++;
+        if (col.s === '') {
+            tr1.innerHTML += `<th class="th1" rowspan="2">${col.m}</th>`;
+        } else {
+            tr1.innerHTML += `<th class="th1" colspan="${span}">${col.m}</th>`;
+        }
+        i += span;
+    }
+    thead.appendChild(tr1);
+    const tr2 = document.createElement('tr');
+    visibleCols.forEach(col => {
+        if (col.s === '') return;
+        tr2.innerHTML += `<th class="th2 ${col.c}">${col.s}</th>`;
     });
-    kml+=`</ExtendedData></Placemark>`;
-  });
-  kml+=`\n</Folder></Document></kml>`;
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([kml],{type:'application/vnd.google-earth.kml+xml'}));
-  a.download=`مستهدف_الموجة_${td()}.kml`; a.click();
-  setStatus(`<i class="fas fa-check-circle"></i> تم تصدير ${cnt} نقطة إلى KML`,'success');
+    thead.appendChild(tr2);
 }
 
-// ── HELPERS ──
-const hs=r=>(r['حالة المتغير فى الموجة']||'').trim();
-const S=(id,v)=>document.getElementById(id).textContent=v;
-const td=()=>new Date().toISOString().split('T')[0];
-const groupBy=(arr,k)=>arr.reduce((a,r)=>{const key=(r[k]||'غير محدد').trim();(a[key]=a[key]||[]).push(r);return a;},{});
-function setStatus(html,type='info'){
-  const b=document.getElementById('statusBar');
-  b.className=`status-bar ${type}`;b.innerHTML=html;
+function cntTarget(center, prop) {
+    return allRows.filter(r =>
+        (r['المركز'] || '').trim() === center &&
+        (r['نوع الاملاك'] || '').trim() === prop
+    ).length;
+}
+
+function cntStat(center, stats, prop) {
+    return allRows.filter(r =>
+        (r['المركز'] || '').trim() === center &&
+        stats.includes((r['حالة المتغير فى الموجة'] || '').trim()) &&
+        (prop === null || (r['نوع الاملاك'] || '').trim() === prop) &&
+        (r['المعادلة'] || '').trim() === 'تم'
+    ).length;
+}
+
+function calcRow(center) {
+    let tP = 0, tG = 0, dP = 0, dG = 0, pP = 0, pG = 0, fP = 0, fG = 0;
+    let nP = 0, nG = 0, wP = 0, wG = 0, tw = 0, ts = 0;
+    if (currentFilter === 'all' || currentFilter === 'priv') {
+        tP = cntTarget(center, PRIV);
+        dP = cntStat(center, DONE, PRIV);
+        pP = cntStat(center, PREV, PRIV);
+        fP = cntStat(center, FAIL, PRIV);
+        nP = cntStat(center, NONO, PRIV);
+        wP = cntStat(center, WILA, PRIV);
+    }
+    if (currentFilter === 'all' || currentFilter === 'govt') {
+        tG = cntTarget(center, GOVT);
+        dG = cntStat(center, DONE, GOVT);
+        pG = cntStat(center, PREV, GOVT);
+        fG = cntStat(center, FAIL, GOVT);
+        nG = cntStat(center, NONO, GOVT);
+        wG = cntStat(center, WILA, GOVT);
+    }
+    tw = cntStat(center, TATW, null);
+    ts = cntStat(center, TASA, null);
+    const tT = tP + tG;
+    const dT = dP + dG;
+    const pT = pP + pG;
+    const fT = fP + fG;
+    const nT = nP + nG;
+    const wT = wP + wG;
+    const rP = tP - (dP + pP + fP + nP + wP);
+    const rG = tG - (dG + pG + fG + nG + wG + tw);
+    const rT = tT - (dT + pT + fT + nT + wT + tw);
+    if (currentFilter === 'priv') {
+        return [tP, dP, pP, fP, nP, wP, tw, ts, rP];
+    }
+    if (currentFilter === 'govt') {
+        return [tG, dG, pG, fG, nG, wG, tw, ts, rG];
+    }
+    return [tP,tG,tT, dP,dG,dT, pP,pG,pT, fP,fG,fT, nP,nG,nT, wP,wG,wT, tw,ts, rP,rG,rT];
+}
+
+function sumRow(a, b) {
+    return a.map((v, i) => v + (b[i] || 0));
+}
+
+function cells(dataRow) {
+    const cols = getVisibleCols();
+    return dataRow.map((v, i) => {
+        const col = cols[i] || {};
+        return `<td class="${col.p || ''} ${col.c || ''}${v===0?' z':''}">${v||'—'}</td>`;
+    }).join('');
+}
+
+function renderReport() {
+    const visibleCols = getVisibleCols();
+    const tbody = document.getElementById('reportBody');
+    tbody.innerHTML = '';
+    let grandTotal = new Array(visibleCols.length).fill(0);
+    Object.entries(STRUCTURE).forEach(([region, districts]) => {
+        let regionTotal = new Array(visibleCols.length).fill(0);
+        districts.forEach(dist => {
+            const data = calcRow(dist);
+            regionTotal = sumRow(regionTotal, data);
+            const tr = document.createElement('tr');
+            tr.className = 'tr-d';
+            tr.innerHTML = `<td class="td-n">${dist.replace('حى ','')}</td>` + cells(data);
+            tbody.appendChild(tr);
+        });
+        grandTotal = sumRow(grandTotal, regionTotal);
+        const trReg = document.createElement('tr');
+        trReg.className = 'tr-r';
+        trReg.innerHTML = `<td class="td-nr">إجمالي ${region}</td>` + cells(regionTotal);
+        tbody.appendChild(trReg);
+    });
+    const trGrand = document.createElement('tr');
+    trGrand.className = 'tr-g';
+    trGrand.innerHTML = `<td class="td-nr">الإجمالي العام</td>` + cells(grandTotal);
+    tbody.appendChild(trGrand);
+    document.getElementById('tableWrap').style.display = 'block';
+}
+
+function setFilter(mode) {
+    currentFilter = mode;
+    document.querySelectorAll('.prop-btn').forEach(b => b.classList.remove('act-all','act-priv','act-govt'));
+    if (mode === 'priv') document.getElementById('btnPriv').classList.add('act-priv');
+    else if (mode === 'govt') document.getElementById('btnGovt').classList.add('act-govt');
+    else document.getElementById('btnAll').classList.add('act-all');
+    if (allRows.length > 0) {
+        buildHeader();
+        renderReport();
+    }
+}
+
+function exportExcel() {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(document.getElementById('reportTable'));
+    XLSX.utils.book_append_sheet(wb, ws, 'تقرير ملخص');
+    XLSX.writeFile(wb, `تقرير_ملخص_الموجة_28_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+function exportDetailedExcel() {
+    if (allRows.length === 0) {
+        alert('لا توجد بيانات محملة بعد');
+        return;
+    }
+    
+    // تحويل البيانات الخام إلى ورقة عمل
+    const headers = Object.keys(allRows[0]);
+    const data = [headers, ...allRows.map(row => headers.map(h => row[h] || ''))];
+    
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // تحسين عرض الأعمدة (اختياري)
+    const colWidths = headers.map(h => ({ wch: Math.max(12, h.length * 1.5) }));
+    ws['!cols'] = colWidths;
+    
+    XLSX.utils.book_append_sheet(wb, ws, 'البيانات التفصيلية');
+    XLSX.writeFile(wb, `تقرير_تفصيلي_الموجة_28_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+async function exportAsJPG() {
+    const tableWrap = document.getElementById('tableWrap');
+    const statusBar = document.getElementById('statusBar');
+    const originalStatus = statusBar.innerHTML;
+    
+    const elementsToHide = document.querySelectorAll('.no-jpg-export, .header, .load-panel, .filter-panel, .status-bar');
+    elementsToHide.forEach(el => el.classList.add('jpg-export-hidden'));
+    
+    tableWrap.classList.add('jpg-export-black-bold');
+    setStatus('<i class="fas fa-image"></i> جاري إنشاء الصورة...', 'loading');
+    
+    try {
+        await new Promise(r => setTimeout(r, 200));
+        const canvas = await html2canvas(tableWrap, {
+            scale: 3,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            width: tableWrap.scrollWidth,
+            height: tableWrap.scrollHeight,
+            windowWidth: tableWrap.scrollWidth,
+            windowHeight: tableWrap.scrollHeight
+        });
+        const link = document.createElement('a');
+        link.download = `تقرير_الموجة_28_${new Date().toISOString().split('T')[0]}.jpg`;
+        link.href = canvas.toDataURL('image/jpeg', 0.98);
+        link.click();
+        setStatus('<i class="fas fa-check-circle"></i> تم التصدير', 'success');
+    } catch (err) {
+        setStatus('<i class="fas fa-exclamation-triangle"></i> فشل التصدير', 'error');
+        console.error(err);
+    } finally {
+        elementsToHide.forEach(el => el.classList.remove('jpg-export-hidden'));
+        tableWrap.classList.remove('jpg-export-black-bold');
+        setTimeout(() => setStatus(originalStatus, 'info'), 1200);
+    }
+}
+
+function setStatus(html, type = 'info') {
+    const bar = document.getElementById('statusBar');
+    bar.className = `status-bar ${type}`;
+    bar.innerHTML = html;
 }
 </script>
 </body>
