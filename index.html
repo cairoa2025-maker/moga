@@ -236,82 +236,152 @@ th, td {
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
 }
+
+/* تحسينات الطباعة */
 @media print {
     @page {
         size: A4 landscape;
-        margin: 3mm !important;
-        padding: 0mm !important;
+        margin: 4mm !important;
+        padding: 0 !important;
     }
+
     * {
         margin: 0 !important;
         padding: 0 !important;
+        background: white !important;
     }
+
     html, body {
         margin: 0 !important;
         padding: 0 !important;
-        border: 0 !important;
-        width: 100% !important;
-        height: auto !important;
         background: white !important;
-    }
-    body {
-        background: white !important;
-        color: black !important;
-        font-size: 9pt !important;
-        line-height: 1 !important;
-    }
-    .header, .load-panel, .filter-panel, .status-bar, .table-top button {
-        display: none !important;
-    }
-    .main {
-        padding: 0 !important;
-        margin: 0 !important;
-        max-width: none !important;
-        width: 100% !important;
-    }
-    .table-wrap, .tbl-scroll {
-        overflow: visible !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-        box-shadow: none !important;
-        background: white !important;
-        width: 100% !important;
-    }
-    table {
         width: 100%;
-        font-size: 9pt !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        border-collapse: collapse !important;
-        line-height: 1 !important;
+        height: auto;
     }
-    th, td {
-        border: 0.5px solid #999 !important;
-        padding: 2px 2px !important;
-        font-size: 8pt !important;
-        white-space: nowrap !important;
-        color: black !important;
-        font-weight: 900 !important;
-        height: auto !important;
-        line-height: 1 !important;
-        max-width: 50px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-    }
+
+    .header,
+    .load-panel,
+    .filter-panel,
+    .status-bar,
     .table-top {
         display: none !important;
-        border-bottom: none !important;
-        margin-bottom: 0 !important;
     }
+
+    .main {
+        padding: 2mm !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .table-wrap {
+        overflow: visible !important;
+        border: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .tbl-scroll {
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        table-layout: fixed !important;
+        font-size: 6pt !important;
+    }
+
+    thead {
+        display: table-header-group !important;
+    }
+
+    tbody {
+        display: table-row-group !important;
+    }
+
     tr {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+        height: auto !important;
     }
+
+    th {
+        background: #dbeafe !important;
+        border: 0.3px solid #333 !important;
+        padding: 1px !important;
+        font-size: 5.5pt !important;
+        font-weight: 700 !important;
+        white-space: normal !important;
+        color: black !important;
+        text-align: center !important;
+        line-height: 1 !important;
+        word-break: break-word !important;
+    }
+
+    td {
+        border: 0.3px solid #666 !important;
+        padding: 0.5px !important;
+        font-size: 6pt !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        color: black !important;
+        text-align: center !important;
+        height: 12px !important;
+    }
+
+    .td-n, .td-nr {
+        text-align: right !important;
+        padding-right: 2px !important;
+        font-weight: 700 !important;
+        font-size: 6pt !important;
+        max-width: none !important;
+        min-width: auto !important;
+        width: auto !important;
+    }
+
+    .tr-d td {
+        background: white !important;
+    }
+
+    .tr-d:nth-child(even) td {
+        background: #fafafa !important;
+    }
+
+    .tr-r td {
+        background: #bfdbfe !important;
+        color: black !important;
+        font-weight: 700 !important;
+        border: 0.3px solid #333 !important;
+    }
+
     .tr-g td {
-        font-size: 9pt !important;
+        background: #93c5fd !important;
+        color: black !important;
+        font-weight: 700 !important;
+        border: 0.5px solid #000 !important;
+    }
+
+    .th1 {
+        background: #dbeafe !important;
+        border: 0.3px solid #333 !important;
+    }
+
+    .th2 {
+        background: #eff6ff !important;
+        border: 0.3px solid #333 !important;
+    }
+
+    .z {
+        color: #999 !important;
+        font-weight: 600 !important;
     }
 }
 </style>
@@ -350,17 +420,31 @@ th, td {
         <span>اضغط "تحميل البيانات" للاتصال بـ Google Sheets مباشرة</span>
     </div>
     <div class="filter-panel" id="filterPanel">
-        <span class="filter-label"><i class="fas fa-filter" style="margin-left:6px;color:var(--accent)"></i>عرض حسب نوع الأملاك:</span>
-        <div class="prop-btns">
-            <button class="prop-btn act-all" id="btnAll" onclick="setFilter('all')">
-                <i class="fas fa-layer-group"></i> الكل
-            </button>
-            <button class="prop-btn" id="btnPriv" onclick="setFilter('priv')">
-                <i class="fas fa-home"></i> خاصة فقط
-            </button>
-            <button class="prop-btn" id="btnGovt" onclick="setFilter('govt')">
-                <i class="fas fa-landmark"></i> دولة فقط
-            </button>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;width:100%">
+            <div style="display:flex;align-items:center;gap:8px">
+                <span class="filter-label"><i class="fas fa-filter" style="margin-left:6px;color:var(--accent)"></i>عرض حسب نوع الأملاك:</span>
+                <div class="prop-btns">
+                    <button class="prop-btn act-all" id="btnAll" onclick="setFilter('all')">
+                        <i class="fas fa-layer-group"></i> الكل
+                    </button>
+                    <button class="prop-btn" id="btnPriv" onclick="setFilter('priv')">
+                        <i class="fas fa-home"></i> خاصة فقط
+                    </button>
+                    <button class="prop-btn" id="btnGovt" onclick="setFilter('govt')">
+                        <i class="fas fa-landmark"></i> دولة فقط
+                    </button>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:250px">
+                <span class="filter-label"><i class="fas fa-search" style="margin-left:6px;color:var(--accent)"></i>البحث عن حي:</span>
+                <input type="text" id="districtSearch" class="api-url-input" 
+                    placeholder="اكتب اسم الحي..." 
+                    style="flex:1;font-size:12px;direction:rtl"
+                    onkeyup="filterByDistrict()">
+                <button class="btn btn-primary" onclick="clearDistrictFilter()" style="padding:9px 14px">
+                    <i class="fas fa-times"></i> مسح
+                </button>
+            </div>
         </div>
     </div>
     <div class="table-wrap" id="tableWrap" style="display:none">
@@ -592,28 +676,53 @@ function renderReport() {
     const tbody = document.getElementById('reportBody');
     tbody.innerHTML = '';
     let grandTotal = new Array(visibleCols.length).fill(0);
-    Object.entries(STRUCTURE).forEach(([region, districts]) => {
+    let hasVisibleRows = false;
+    
+    Object.entries(STRUCTURE).forEach(([region, allDistricts]) => {
         let regionTotal = new Array(visibleCols.length).fill(0);
-        districts.forEach(dist => {
+        let regionHasRows = false;
+        
+        // تصفية الأحياء بناءً على البحث
+        const filteredDistricts = districtFilter 
+            ? allDistricts.filter(dist => dist.includes(districtFilter))
+            : allDistricts;
+        
+        filteredDistricts.forEach(dist => {
             const data = calcRow(dist);
             regionTotal = sumRow(regionTotal, data);
+            regionHasRows = true;
+            hasVisibleRows = true;
+            
             const tr = document.createElement('tr');
             tr.className = 'tr-d';
             tr.innerHTML = `<td class="td-n">${dist.replace('حى ','')}</td>` + cells(data);
             tbody.appendChild(tr);
         });
-        grandTotal = sumRow(grandTotal, regionTotal);
-        const trReg = document.createElement('tr');
-        trReg.className = 'tr-r';
-        trReg.innerHTML = `<td class="td-nr">إجمالي ${region}</td>` + cells(regionTotal);
-        tbody.appendChild(trReg);
+        
+        // عرض إجمالي المنطقة فقط إذا كان هناك صفوف مرئية
+        if (regionHasRows) {
+            grandTotal = sumRow(grandTotal, regionTotal);
+            const trReg = document.createElement('tr');
+            trReg.className = 'tr-r';
+            trReg.innerHTML = `<td class="td-nr">إجمالي ${region}</td>` + cells(regionTotal);
+            tbody.appendChild(trReg);
+        }
     });
-    const trGrand = document.createElement('tr');
-    trGrand.className = 'tr-g';
-    trGrand.innerHTML = `<td class="td-nr">الإجمالي العام</td>` + cells(grandTotal);
-    tbody.appendChild(trGrand);
+    
+    // عرض الإجمالي العام فقط إذا كان هناك نتائج
+    if (hasVisibleRows) {
+        const trGrand = document.createElement('tr');
+        trGrand.className = 'tr-g';
+        trGrand.innerHTML = `<td class="td-nr">الإجمالي العام</td>` + cells(grandTotal);
+        tbody.appendChild(trGrand);
+    } else {
+        tbody.innerHTML = '<tr><td colspan="100" style="text-align:center;padding:20px;color:#999">لا توجد نتائج للبحث عن "<strong>' + districtFilter + '</strong>"</td></tr>';
+    }
+    
     document.getElementById('tableWrap').style.display = 'block';
 }
+
+let districtFilter = '';
 
 function setFilter(mode) {
     currentFilter = mode;
@@ -621,6 +730,23 @@ function setFilter(mode) {
     if (mode === 'priv') document.getElementById('btnPriv').classList.add('act-priv');
     else if (mode === 'govt') document.getElementById('btnGovt').classList.add('act-govt');
     else document.getElementById('btnAll').classList.add('act-all');
+    if (allRows.length > 0) {
+        buildHeader();
+        renderReport();
+    }
+}
+
+function filterByDistrict() {
+    districtFilter = document.getElementById('districtSearch').value.trim();
+    if (allRows.length > 0) {
+        buildHeader();
+        renderReport();
+    }
+}
+
+function clearDistrictFilter() {
+    document.getElementById('districtSearch').value = '';
+    districtFilter = '';
     if (allRows.length > 0) {
         buildHeader();
         renderReport();
