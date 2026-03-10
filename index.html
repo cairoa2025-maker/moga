@@ -154,6 +154,7 @@ table {
     font-size: 20px;
     font-weight: 900;
     color: black;
+    table-layout: fixed;
 }
 th, td {
     padding: 4px 3px;
@@ -167,8 +168,8 @@ th, td {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.th1 { background: #eff6ff; color: #000000; font-size: 10px; font-weight: 900; }
-.th2 { background: #dbeafe; color: #000000; font-size: 9px; font-weight: 900; }
+.th1 { background: #eff6ff; color: #000000; font-size: 14px; font-weight: 900; }
+.th2 { background: #dbeafe; color: #000000; font-size: 13px; font-weight: 900; }
 .tr-d td { background: #ffffff; }
 .tr-d:nth-child(even) td { background: #f8fafc; }
 .tr-d:hover td { background: #f1f5f9; }
@@ -185,8 +186,36 @@ th, td {
     font-size: 12px;
     border-top: 3px solid #3b82f6 !important;
 }
-.td-n { text-align: right !important; font-weight: 800 !important; padding-right: 14px !important; max-width: 30px !important; font-size: 18px !important; }
-.td-nr { text-align: right !important; font-weight: 900 !important; padding-right: 14px !important; max-width: 30px !important; font-size: 18px !important; }
+.td-n { 
+    text-align: right !important; 
+    font-weight: 800 !important; 
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    max-width: 25px !important; 
+    font-size: 16px !important;
+    min-width: 25px !important;
+    width: 25px !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
+    white-space: pre-wrap !important;
+}
+.td-nr { 
+    text-align: right !important; 
+    font-weight: 900 !important; 
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    max-width: 25px !important; 
+    font-size: 16px !important;
+    min-width: 25px !important;
+    width: 25px !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
+    white-space: pre-wrap !important;
+}
 .ctg { color: #000000 !important; } .cdn { color: #000000 !important; } .cpv { color: #000000 !important; }
 .cfl { color: #000000 !important; } .cnn { color: #000000 !important; } .cwl { color: #000000 !important; }
 .ctw { color: #000000 !important; } .cts { color: #000000 !important; } .crm { color: #000000 !important; }
