@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
@@ -185,6 +186,9 @@ th, td {
 .z { color: #6b7280 !important; font-weight: 700 !important; }
 .no-jpg-export { display: block; }
 .jpg-export-hidden { display: none !important; }
+.jpg-export-black-bold {
+    filter: contrast(1.1) brightness(0.95) !important;
+}
 .jpg-export-black-bold td,
 .jpg-export-black-bold th,
 .jpg-export-black-bold .td-n,
@@ -192,17 +196,33 @@ th, td {
 .jpg-export-black-bold .tr-r td,
 .jpg-export-black-bold .tr-g td {
     color: #000000 !important;
-    font-weight: 800 !important;
+    font-weight: 900 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
 }
 @media print {
     @page {
         size: A4 landscape;
-        margin: 1mm;
+        margin: 3mm !important;
+        padding: 0mm !important;
+    }
+    * {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: white !important;
     }
     body {
         background: white !important;
         color: black !important;
-        font-size: 7pt !important;
+        font-size: 9pt !important;
+        line-height: 1 !important;
     }
     .header, .load-panel, .filter-panel, .status-bar, .table-top button {
         display: none !important;
@@ -211,32 +231,51 @@ th, td {
         padding: 0 !important;
         margin: 0 !important;
         max-width: none !important;
+        width: 100% !important;
     }
     .table-wrap, .tbl-scroll {
         overflow: visible !important;
         page-break-inside: avoid !important;
-        break-inside: avoid-page !important;
+        break-inside: avoid !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: white !important;
+        width: 100% !important;
     }
     table {
         width: 100%;
-        font-size: 8.5pt !important;
+        font-size: 9pt !important;
         page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        border-collapse: collapse !important;
+        line-height: 1 !important;
     }
     th, td {
-        border: 1px solid #777 !important;
-        padding: 3px 4px !important;
-        font-size: 7pt !important;
-        white-space: normal !important;
-        word-break: break-word !important;
+        border: 0.5px solid #999 !important;
+        padding: 2px 2px !important;
+        font-size: 8pt !important;
+        white-space: nowrap !important;
         color: black !important;
-        font-weight: bold !important;
+        font-weight: 900 !important;
+        height: auto !important;
+        line-height: 1 !important;
+        max-width: 50px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     .table-top {
+        display: none !important;
         border-bottom: none !important;
-        margin-bottom: 8px;
+        margin-bottom: 0 !important;
+    }
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
     .tr-g td {
-        font-size: 10pt !important;
+        font-size: 9pt !important;
     }
 }
 </style>
@@ -594,18 +633,20 @@ async function exportAsJPG() {
     try {
         await new Promise(r => setTimeout(r, 200));
         const canvas = await html2canvas(tableWrap, {
-            scale: 3,
+            scale: 4,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
             width: tableWrap.scrollWidth,
             height: tableWrap.scrollHeight,
             windowWidth: tableWrap.scrollWidth,
-            windowHeight: tableWrap.scrollHeight
+            windowHeight: tableWrap.scrollHeight,
+            imageTimeout: 0,
+            allowTaint: true
         });
         const link = document.createElement('a');
         link.download = `تقرير_الموجة_28_${new Date().toISOString().split('T')[0]}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.98);
+        link.href = canvas.toDataURL('image/jpeg', 0.99);
         link.click();
         setStatus('<i class="fas fa-check-circle"></i> تم التصدير', 'success');
     } catch (err) {
