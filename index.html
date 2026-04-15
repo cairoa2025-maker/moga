@@ -1,831 +1,150 @@
-
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تقرير الموجة 28</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<title>متغيرات محافظة القاهرة</title>
+
 <style>
-:root {
-    --bg: #f8fafc;
-    --surface: #ffffff;
-    --border: #e2e8f0;
-    --text: #0f172a;
-    --muted: #64748b;
-    --accent: #3b82f6;
-    --green: #16a34a;
-    --red: #dc2626;
-    --yellow: #d97706;
-    --purple: #7c3aed;
-}
-* { margin:0; padding:0; box-sizing:border-box; }
 body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    direction: rtl;
-    line-height: 1.5;
+  margin: 0;
+  padding: 2rem 1.5rem;
+  font-family: Arial, sans-serif;
+  background-color: #f9fafb;
+  color: #111827;
 }
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* 🔹 الهيدر الجديد */
 .header {
-    background: linear-gradient(135deg, #eff6ff, #dbeafe);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 28px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-direction: row-reverse; /* عشان العربي */
 }
-.header-icon {
-    width: 46px; height: 46px;
-    background: linear-gradient(135deg, var(--accent), var(--purple));
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; color: white;
+
+.logo {
+  width: 70px;
+  height: auto;
 }
-.header h1 { font-size: 20px; font-weight: 800; }
-.header p { font-size: 11px; color: var(--muted); }
-.header-meta { margin-right: auto; }
-.header-date { font-size: 11px; color: var(--muted); }
-.main { padding: 22px 28px; max-width: 1900px; margin: 0 auto; }
-.load-panel, .filter-panel, .table-wrap, .status-bar {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+/* 🔹 تعديل العنوان */
+h1 {
+  font-size: 3rem;      /* أكبر */
+  font-weight: 800;     /* تخين */
+  margin: 0 0 2rem 0;
+  line-height: 1.2;
 }
-.load-panel { padding: 24px; margin-bottom: 16px; }
-.load-title { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
-.api-url-input {
-    flex: 1;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 11px 14px;
-    font-family: monospace;
-    font-size: 12px;
-    direction: ltr;
-    min-width: 200px;
+
+.buttons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
-.api-url-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
-}
+
 .btn {
-    padding: 9px 17px;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.btn:disabled { opacity: .3; cursor: not-allowed; }
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: #2563eb; }
-.btn-green { background: var(--green); color: white; }
-.btn-green:hover { background: #15803d; }
-.btn-purple { background: var(--purple); color: white; }
-.btn-purple:hover { background: #6d28d9; }
-.btn-red { background: var(--red); color: white; }
-.btn-red:hover { background: #b91c1c; }
-.btn-orange { background: #f97316; color: white; }
-.btn-orange:hover { background: #ea580c; }
-.status-bar {
-    padding: 10px 14px;
-    font-size: 12px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-.status-bar.success { border-left: 4px solid var(--green); color: #166534; background: #f0fdf4; }
-.status-bar.error { border-left: 4px solid var(--red); color: #991b1b; background: #fef2f2; }
-.status-bar.info { border-left: 4px solid var(--accent); color: #1e40af; background: #eff6ff; }
-.status-bar.loading { border-left: 4px solid var(--yellow); color: #92400e; background: #fefce8; }
-.filter-panel {
-    padding: 14px 20px;
-    margin-bottom: 14px;
-    display: none;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-.filter-panel.show { display: flex; }
-.filter-label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
-.prop-btns { display: flex; gap: 10px; flex-wrap: wrap; }
-.prop-btn {
-    padding: 8px 18px;
-    border: 2px solid #cbd5e1;
-    border-radius: 8px;
-    background: transparent;
-    color: var(--text);
-    font-weight: 700;
-    cursor: pointer;
-    transition: all .2s;
-}
-.prop-btn:hover { border-color: var(--accent); background: #eff6ff; }
-.prop-btn.act-all { border-color: var(--accent); background: #eff6ff; color: var(--accent); }
-.prop-btn.act-priv { border-color: var(--green); background: #f0fdf4; color: var(--green); }
-.prop-btn.act-govt { border-color: var(--purple); background: #f3e8ff; color: var(--purple); }
-.table-wrap { overflow: hidden; margin-bottom: 16px; }
-.table-top {
-    padding: 13px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 12px;
-}
-.tbl-scroll { overflow-x: auto; }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 20px;
-    font-weight: 900;
-    color: black;
-    table-layout: fixed;
-}
-th, td {
-    padding: 4px 3px;
-    text-align: center;
-    border: 1px solid #e2e8f0;
-    white-space: nowrap;
-    font-size: 20px;
-    font-weight: 900;
-    color: black;
-    max-width: 35px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.th1 { background: #eff6ff; color: #000000; font-size: 14px; font-weight: 900; }
-.th2 { background: #dbeafe; color: #000000; font-size: 13px; font-weight: 900; }
-.tr-d td { background: #ffffff; }
-.tr-d:nth-child(even) td { background: #f8fafc; }
-.tr-d:hover td { background: #f1f5f9; }
-.tr-r td {
-    background: #e0f2fe !important;
-    color: #000000 !important;
-    font-weight: 900 !important;
-    border-top: 2px solid #60a5fa !important;
-}
-.tr-g td {
-    background: #bfdbfe !important;
-    color: #000000 !important;
-    font-weight: 900 !important;
-    font-size: 12px;
-    border-top: 3px solid #3b82f6 !important;
-}
-.td-n { 
-    text-align: right !important; 
-    font-weight: 800 !important; 
-    padding-right: 2px !important;
-    padding-left: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    max-width: 25px !important; 
-    font-size: 16px !important;
-    min-width: 25px !important;
-    width: 25px !important;
-    word-break: break-word !important;
-    overflow: hidden !important;
-    white-space: pre-wrap !important;
-}
-.td-nr { 
-    text-align: right !important; 
-    font-weight: 900 !important; 
-    padding-right: 2px !important;
-    padding-left: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    max-width: 25px !important; 
-    font-size: 16px !important;
-    min-width: 25px !important;
-    width: 25px !important;
-    word-break: break-word !important;
-    overflow: hidden !important;
-    white-space: pre-wrap !important;
-}
-.ctg { color: #000000 !important; } .cdn { color: #000000 !important; } .cpv { color: #000000 !important; }
-.cfl { color: #000000 !important; } .cnn { color: #000000 !important; } .cwl { color: #000000 !important; }
-.ctw { color: #000000 !important; } .cts { color: #000000 !important; } .crm { color: #000000 !important; }
-.z { color: #000000 !important; font-weight: 700 !important; }
-.no-jpg-export { display: block; }
-.jpg-export-hidden { display: none !important; }
-.jpg-export-black-bold {
-    filter: contrast(1.1) brightness(0.95) !important;
-}
-.jpg-export-black-bold td,
-.jpg-export-black-bold th,
-.jpg-export-black-bold .td-n,
-.jpg-export-black-bold .td-nr,
-.jpg-export-black-bold .tr-r td,
-.jpg-export-black-bold .tr-g td {
-    color: #000000 !important;
-    font-weight: 900 !important;
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
+  padding: 1.2rem 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+  text-align: center;
+  direction: rtl;
 }
 
-/* تحسينات الطباعة */
-@media print {
-    @page {
-        size: A4 landscape;
-        margin: 4mm !important;
-        padding: 0 !important;
-    }
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+}
 
-    * {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-    }
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
 
-    html, body {
-        margin: 0 !important;
-        padding: 0 !important;
-        background: white !important;
-        width: 100%;
-        height: auto;
-    }
+.btn-secondary {
+  background-color: #7c3aed;
+  color: white;
+}
 
-    .header,
-    .load-panel,
-    .filter-panel,
-    .status-bar,
-    .table-top {
-        display: none !important;
-    }
+.btn-secondary:hover {
+  background-color: #6d28d9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
 
-    .main {
-        padding: 2mm !important;
-        margin: 0 !important;
-        max-width: 100% !important;
-        width: 100%;
-    }
+.btn-tertiary {
+  background-color: #059669;
+  color: white;
+}
 
-    .table-wrap {
-        overflow: visible !important;
-        border: none !important;
-        box-shadow: none !important;
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+.btn-tertiary:hover {
+  background-color: #047857;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
 
-    .tbl-scroll {
-        overflow: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2.2rem;
+  }
 
-    table {
-        width: 100% !important;
-        border-collapse: collapse !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        table-layout: fixed !important;
-        font-size: 6pt !important;
-    }
+  .logo {
+    width: 50px;
+  }
 
-    thead {
-        display: table-header-group !important;
-    }
-
-    tbody {
-        display: table-row-group !important;
-    }
-
-    tr {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        height: auto !important;
-    }
-
-    th {
-        background: #dbeafe !important;
-        border: 0.3px solid #333 !important;
-        padding: 1px !important;
-        font-size: 5.5pt !important;
-        font-weight: 700 !important;
-        white-space: normal !important;
-        color: black !important;
-        text-align: center !important;
-        line-height: 1 !important;
-        word-break: break-word !important;
-    }
-
-    td {
-        border: 0.3px solid #666 !important;
-        padding: 0.5px !important;
-        font-size: 6pt !important;
-        font-weight: 600 !important;
-        white-space: nowrap !important;
-        color: black !important;
-        text-align: center !important;
-        height: 12px !important;
-    }
-
-    .td-n, .td-nr {
-        text-align: right !important;
-        padding-right: 2px !important;
-        font-weight: 700 !important;
-        font-size: 6pt !important;
-        max-width: none !important;
-        min-width: auto !important;
-        width: auto !important;
-    }
-
-    .tr-d td {
-        background: white !important;
-    }
-
-    .tr-d:nth-child(even) td {
-        background: #fafafa !important;
-    }
-
-    .tr-r td {
-        background: #bfdbfe !important;
-        color: black !important;
-        font-weight: 700 !important;
-        border: 0.3px solid #333 !important;
-    }
-
-    .tr-g td {
-        background: #93c5fd !important;
-        color: black !important;
-        font-weight: 700 !important;
-        border: 0.5px solid #000 !important;
-    }
-
-    .th1 {
-        background: #dbeafe !important;
-        border: 0.3px solid #333 !important;
-    }
-
-    .th2 {
-        background: #eff6ff !important;
-        border: 0.3px solid #333 !important;
-    }
-
-    .z {
-        color: #999 !important;
-        font-weight: 600 !important;
-    }
+  .btn {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+  }
 }
 </style>
 </head>
+
 <body>
-<div class="header">
-    <div class="header-icon"><i class="fas fa-city"></i></div>
-    <div>
-        <h1>تقرير الموجة 28</h1>
-        <p>ملخص بالمناطق والأحياء — أملاك خاصة / أملاك دولة</p>
-    </div>
-    <div class="header-meta">
-        <div class="header-date" id="hDate"></div>
-        <div class="online-badge" id="onlineBadge" style="display:none">
-            <div class="dot"></div> متصل بالشيت
-        </div>
-    </div>
-</div>
-<div class="main">
-    <div class="load-panel">
-        <div class="load-title"><i class="fas fa-plug"></i> اتصال بـ Google Sheets API</div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-            <input class="api-url-input" type="text" id="apiUrl"
-                value="https://script.google.com/macros/s/AKfycbzCis7BfG4D8ZL3Uu9Tg4ykXGZ0OVz73fdT3nHvPgDRwmLuiE7FN-wImGDFGGXnYbs0QA/exec"
-                placeholder="رابط Apps Script Web App">
-            <button class="btn btn-primary" onclick="loadData()">
-                <i class="fas fa-cloud-download-alt"></i> تحميل البيانات
-            </button>
-            <button class="btn btn-purple" id="refreshBtn" onclick="loadData()" disabled>
-                <i class="fas fa-sync-alt"></i> تحديث
-            </button>
-        </div>
-    </div>
-    <div class="status-bar info" id="statusBar">
-        <i class="fas fa-info-circle"></i>
-        <span>اضغط "تحميل البيانات" للاتصال بـ Google Sheets مباشرة</span>
-    </div>
-    <div class="filter-panel" id="filterPanel">
-        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;width:100%">
-            <div style="display:flex;align-items:center;gap:8px">
-                <span class="filter-label"><i class="fas fa-filter" style="margin-left:6px;color:var(--accent)"></i>عرض حسب نوع الأملاك:</span>
-                <div class="prop-btns">
-                    <button class="prop-btn act-all" id="btnAll" onclick="setFilter('all')">
-                        <i class="fas fa-layer-group"></i> الكل
-                    </button>
-                    <button class="prop-btn" id="btnPriv" onclick="setFilter('priv')">
-                        <i class="fas fa-home"></i> خاصة فقط
-                    </button>
-                    <button class="prop-btn" id="btnGovt" onclick="setFilter('govt')">
-                        <i class="fas fa-landmark"></i> دولة فقط
-                    </button>
-                </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:250px">
-                <span class="filter-label"><i class="fas fa-search" style="margin-left:6px;color:var(--accent)"></i>البحث عن حي:</span>
-                <input type="text" id="districtSearch" class="api-url-input" 
-                    placeholder="اكتب اسم الحي..." 
-                    style="flex:1;font-size:12px;direction:rtl"
-                    onkeyup="filterByDistrict()">
-                <button class="btn btn-primary" onclick="clearDistrictFilter()" style="padding:9px 14px">
-                    <i class="fas fa-times"></i> مسح
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="table-wrap" id="tableWrap" style="display:none">
-        <div class="table-top no-jpg-export">
-            <h3 id="tableTitle"><i class="fas fa-table" style="margin-left:8px;color:var(--accent)"></i>تقرير الموجة 28 — ملخص بالمناطق والأحياء</h3>
-            <div style="display:flex;gap:8px">
-                <button class="btn btn-green" onclick="exportExcel()"><i class="fas fa-file-excel"></i> Excel (ملخص)</button>
-                <button class="btn btn-green" onclick="exportDetailedExcel()"><i class="fas fa-file-excel"></i> Excel (تفصيلي)</button>
-                <button class="btn btn-orange" onclick="exportAsJPG()"><i class="fas fa-file-image"></i> تصدير JPG</button>
-                <button class="btn btn-red" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
-            </div>
-        </div>
-        <div class="tbl-scroll">
-            <table id="reportTable">
-                <thead id="reportHead"></thead>
-                <tbody id="reportBody"></tbody>
-            </table>
-        </div>
-    </div>
+
+<div class="container">
+
+  <!-- 🔹 العنوان مع الشعار -->
+  <div class="header">
+    
+    <h1>متغيرات محافظة القاهرة</h1>
+  </div>
+
+  <div class="buttons-grid">
+    
+<a href="https://www.appsheet.com/start/37a6eea8-e843-4791-914b-0f8927f05889?platform=desktop#appName=%D8%A7%D9%84%D8%BA%D9%8A%D8%B1_%D9%82%D8%A7%D9%86%D9%88%D9%86%D9%8A-574036975&vss=H4sIAAAAAAAAA63PvwrCMBAG8FeRm_NEWcVBRBfFxTjE5grBNiltqpaQzTr4IqJv4Jskb2PqH1zc6nTcd_DjOws7ifu54ckW6Mp-twk2QMEyWDQFMqAMhlqZUmcMCIMZz1-hv4V24C_hGFp_j_McTv7KwIFbkw9msAJqe1j0j70ISIHKyFRi2cEdE8E3Es8dEYOfADgCeW34JsPnXxFwLmapTuoKxTKW7FuuGqvRoeBKTLWIfsqzCt0D_p52sqYBAAA=&view=%D8%AA%D9%85%20%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%8A%D9%86%D8%A9" 
+   target="_blank" 
+   rel="noopener noreferrer"
+   class="btn btn-primary">
+   غير قانوني
+</a>
+    <a href="https://www.appsheet.com/start/37a6eea8-e843-4791-914b-0f8927f05889?platform=desktop#appName=%D8%A7%D9%84%D8%BA%D9%8A%D8%B1_%D9%82%D8%A7%D9%86%D9%88%D9%86%D9%8A-574036975&vss=H4sIAAAAAAAAA63PvwrCMBAG8FeRm_MEWcVBRBfFxTjE5grBNiltqpaQzTr4IqJv4Jskb2PqH1zc6nTcd_DjOws7ifu54ckW6Mp-twk2QMEyWDQFMqAMhlqZUmcMCIMZz1-hv4V24C_hGFp_j_McTv7KwIFbkw9msAJqe1j0j70ISIHKyFRi2cEdE8E3Es8dEYOfADgCeW34JsPnXxFwLmapTuoKxTKW7FuuGqvRoeBKTLWIfsqzCt0D_p52sqYBAAA=&view=%D8%AA%D9%85%20%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%8A%D9%86%D8%A9" 
+   class="btn btn-secondary"
+   target="_blank"
+   rel="noopener noreferrer">
+   خارج المستهدف
+</a>
+   <a href="https://www.appsheet.com/start/acc80b32-8e8f-4684-b618-e7ba33f3c5ea?platform=desktop#appName=%D8%A7%D9%84%D9%85%D9%88%D8%AC%D8%A928%D8%B4%D8%B1%D9%82%D9%8A%D8%A9-574036975&vss=H4sIAAAAAAAAA63PvQrCMBAH8FcpN3dykqziIKKL4mIcYnOFYr9oUrWEDIJF30QUwcGXSd7G1A_cXOx4_4Pf_U_BOsLNRLJgBWSuvtMQKyCgKEyrHCkQCr0slUUWU_ApjFnyCm1t7uZiD-Zmd5452b2t7dFczdnrdClo0Av_Y0oUQNT_JGm_pQ8Rx1RGYYRF4zeac9-WWzeSC345oH1ISsmWMT6fdY7WLguzoBTIZ65yS1XFIO1vc5byUcbdmZDFAvUDw7s2mskBAAA=&view=%D9%85%D8%B3%D8%AA%D9%87%D8%AF%D9%81%20%D8%A7%D9%84%D9%85%D9%88%D8%AC%D8%A928" 
+   class="btn btn-tertiary"
+   target="_blank"
+   rel="noopener noreferrer">
+   الموجة 28
+</a>
+
+  </div>
+
 </div>
 
-<script>
-const STRUCTURE = {
-    'الجنوبية': ['حى البساتين','حى التبين','حى الخليفه','حى السيده زينب','حى المعادى','حى المعصره','حى المقطم','حى حلوان','حى دار السلام','حى طره','حى مصر القديمه','حى 15 مايو'],
-    'الشرقية': ['حى النزهه','حى شرق مدينه نصر','حى غرب مدينه نصر','حى المرج','حى المطريه','حى اول السلام','حى مصر الجديده','حى ثان السلام','حى عين شمس'],
-    'الشمالية': ['حى الاميريه','حى الزاويه الحمراء','حى الزيتون','حى الساحل','حى الشرابيه','حى حدائق القبه','حى روض الفرج','حى شبرا'],
-    'الغربية': ['حى الازبكيه','حى الموسكى','حى الوايلى','حى باب الشعريه','حى بولاق','حى عابدين','حى وسط','حى غرب','حى منشاه ناصر'],
-};
-const DONE = ['تمت الازالة جزئيا في الموجة','تمت الازالة كليا في الموجة'];
-const PREV = ['تمت الازالة سابقا'];
-const FAIL = ['تعذر الازالة'];
-const NONO = ['لا يحتاج الي ازالة'];
-const WILA = ['جهة ولاية'];
-const TATW = ['تطوير'];
-const TASA = ['تصالح'];
-const PRIV = 'أملاك خاصة';
-const GOVT = 'أملاك دولة';
-let allRows = [];
-let currentFilter = 'all';
-
-document.getElementById('hDate').textContent = new Date().toLocaleDateString('ar-EG', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-window.addEventListener('load', () => {
-    const u = document.getElementById('apiUrl').value.trim();
-    if (u.includes('script.google.com')) setTimeout(loadData, 800);
-});
-
-async function loadData() {
-    const url = document.getElementById('apiUrl').value.trim();
-    if (!url) return setStatus('أدخل رابط API صحيح', 'error');
-    setStatus('<div class="spinner"></div> جاري الاتصال بـ Google Sheets...', 'loading');
-    document.getElementById('refreshBtn').disabled = true;
-    try {
-        const resp = await fetch(url);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const json = await resp.json();
-        const rows = json.data || json || [];
-        if (!Array.isArray(rows) || rows.length === 0) {
-            throw new Error('لا توجد بيانات صالحة في الرد');
-        }
-        allRows = rows.map(r => {
-            const n = {};
-            Object.keys(r).forEach(k => { n[k.trim()] = String(r[k] ?? '').trim(); });
-            return n;
-        }).filter(r => Object.values(r).some(v => v !== ''));
-        document.getElementById('onlineBadge').style.display = 'inline-flex';
-        document.getElementById('refreshBtn').disabled = false;
-        document.getElementById('filterPanel').classList.add('show');
-        buildHeader();
-        renderReport();
-        setStatus(`<i class="fas fa-check-circle"></i> تم تحميل <strong>${allRows.length.toLocaleString('ar')}</strong> سجل ✓`, 'success');
-    } catch (e) {
-        setStatus(`<i class="fas fa-exclamation-circle"></i> ${e.message}`, 'error');
-        document.getElementById('refreshBtn').disabled = false;
-    }
-}
-
-function getVisibleCols() {
-    if (currentFilter === 'priv') {
-        return [
-            {m:'المستهدف', s:'أملاك خاصة', c:'ctg', p:'cp'},
-            {m:'ما تم في الموجة 28', s:'أملاك خاصة', c:'cdn', p:'cp'},
-            {m:'تمت الإزالة سابقاً', s:'أملاك خاصة', c:'cpv', p:'cp'},
-            {m:'تعذر الإزالة', s:'أملاك خاصة', c:'cfl', p:'cp'},
-            {m:'لايحتاج إزالة', s:'أملاك خاصة', c:'cnn', p:'cp'},
-            {m:'جهة ولاية', s:'أملاك خاصة', c:'cwl', p:'cp'},
-            {m:'تطوير', s:'', c:'ctw', p:'ct'},
-            {m:'تصالح', s:'', c:'cts', p:'ct'},
-            {m:'المتبقي', s:'أملاك خاصة', c:'crm', p:'cp'},
-        ];
-    }
-    if (currentFilter === 'govt') {
-        return [
-            {m:'المستهدف', s:'أملاك دولة', c:'ctg', p:'cg'},
-            {m:'ما تم في الموجة 28', s:'أملاك دولة', c:'cdn', p:'cg'},
-            {m:'تمت الإزالة سابقاً', s:'أملاك دولة', c:'cpv', p:'cg'},
-            {m:'تعذر الإزالة', s:'أملاك دولة', c:'cfl', p:'cg'},
-            {m:'لايحتاج إزالة', s:'أملاك دولة', c:'cnn', p:'cg'},
-            {m:'جهة ولاية', s:'أملاك دولة', c:'cwl', p:'cg'},
-            {m:'تطوير', s:'', c:'ctw', p:'ct'},
-            {m:'تصالح', s:'', c:'cts', p:'ct'},
-            {m:'المتبقي', s:'أملاك دولة', c:'crm', p:'cg'},
-        ];
-    }
-    return [
-        {m:'المستهدف', s:'أملاك خاصة', c:'ctg', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'ctg', p:'cg'},
-        {m:'', s:'إجمالي', c:'ctg', p:'ct'},
-        {m:'ما تم في الموجة 28', s:'أملاك خاصة', c:'cdn', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'cdn', p:'cg'},
-        {m:'', s:'إجمالي', c:'cdn', p:'ct'},
-        {m:'تمت الإزالة سابقاً', s:'أملاك خاصة', c:'cpv', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'cpv', p:'cg'},
-        {m:'', s:'إجمالي', c:'cpv', p:'ct'},
-        {m:'تعذر الإزالة', s:'أملاك خاصة', c:'cfl', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'cfl', p:'cg'},
-        {m:'', s:'إجمالي', c:'cfl', p:'ct'},
-        {m:'لايحتاج إزالة', s:'أملاك خاصة', c:'cnn', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'cnn', p:'cg'},
-        {m:'', s:'إجمالي', c:'cnn', p:'ct'},
-        {m:'جهة ولاية', s:'أملاك خاصة', c:'cwl', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'cwl', p:'cg'},
-        {m:'', s:'إجمالي', c:'cwl', p:'ct'},
-        {m:'تطوير', s:'', c:'ctw', p:'ct'},
-        {m:'تصالح', s:'', c:'cts', p:'ct'},
-        {m:'المتبقي', s:'أملاك خاصة', c:'crm', p:'cp'},
-        {m:'', s:'أملاك دولة', c:'crm', p:'cg'},
-        {m:'', s:'إجمالي', c:'crm', p:'ct'},
-    ];
-}
-
-function buildHeader() {
-    const visibleCols = getVisibleCols();
-    const thead = document.getElementById('reportHead');
-    thead.innerHTML = '';
-    const tr1 = document.createElement('tr');
-    tr1.innerHTML = '<th class="th1" rowspan="2" style="min-width:120px">الأحياء</th>';
-    let i = 0;
-    while (i < visibleCols.length) {
-        const col = visibleCols[i];
-        if (!col.m) { i++; continue; }
-        let span = 1;
-        while (i + span < visibleCols.length && !visibleCols[i + span].m) span++;
-        if (col.s === '') {
-            tr1.innerHTML += `<th class="th1" rowspan="2">${col.m}</th>`;
-        } else {
-            tr1.innerHTML += `<th class="th1" colspan="${span}">${col.m}</th>`;
-        }
-        i += span;
-    }
-    thead.appendChild(tr1);
-    const tr2 = document.createElement('tr');
-    visibleCols.forEach(col => {
-        if (col.s === '') return;
-        tr2.innerHTML += `<th class="th2 ${col.c}">${col.s}</th>`;
-    });
-    thead.appendChild(tr2);
-}
-
-function cntTarget(center, prop) {
-    return allRows.filter(r =>
-        (r['المركز'] || '').trim() === center &&
-        (r['نوع الاملاك'] || '').trim() === prop
-    ).length;
-}
-
-function cntStat(center, stats, prop) {
-    return allRows.filter(r =>
-        (r['المركز'] || '').trim() === center &&
-        stats.includes((r['حالة المتغير فى الموجة'] || '').trim()) &&
-        (prop === null || (r['نوع الاملاك'] || '').trim() === prop) &&
-        (r['المعادلة'] || '').trim() === 'تم'
-    ).length;
-}
-
-function calcRow(center) {
-    let tP = 0, tG = 0, dP = 0, dG = 0, pP = 0, pG = 0, fP = 0, fG = 0;
-    let nP = 0, nG = 0, wP = 0, wG = 0, tw = 0, ts = 0;
-    if (currentFilter === 'all' || currentFilter === 'priv') {
-        tP = cntTarget(center, PRIV);
-        dP = cntStat(center, DONE, PRIV);
-        pP = cntStat(center, PREV, PRIV);
-        fP = cntStat(center, FAIL, PRIV);
-        nP = cntStat(center, NONO, PRIV);
-        wP = cntStat(center, WILA, PRIV);
-    }
-    if (currentFilter === 'all' || currentFilter === 'govt') {
-        tG = cntTarget(center, GOVT);
-        dG = cntStat(center, DONE, GOVT);
-        pG = cntStat(center, PREV, GOVT);
-        fG = cntStat(center, FAIL, GOVT);
-        nG = cntStat(center, NONO, GOVT);
-        wG = cntStat(center, WILA, GOVT);
-    }
-    tw = cntStat(center, TATW, null);
-    ts = cntStat(center, TASA, null);
-    const tT = tP + tG;
-    const dT = dP + dG;
-    const pT = pP + pG;
-    const fT = fP + fG;
-    const nT = nP + nG;
-    const wT = wP + wG;
-    const rP = tP - (dP + pP + fP + nP + wP);
-    const rG = tG - (dG + pG + fG + nG + wG + tw);
-    const rT = tT - (dT + pT + fT + nT + wT + tw);
-    if (currentFilter === 'priv') {
-        return [tP, dP, pP, fP, nP, wP, tw, ts, rP];
-    }
-    if (currentFilter === 'govt') {
-        return [tG, dG, pG, fG, nG, wG, tw, ts, rG];
-    }
-    return [tP,tG,tT, dP,dG,dT, pP,pG,pT, fP,fG,fT, nP,nG,nT, wP,wG,wT, tw,ts, rP,rG,rT];
-}
-
-function sumRow(a, b) {
-    return a.map((v, i) => v + (b[i] || 0));
-}
-
-function cells(dataRow) {
-    const cols = getVisibleCols();
-    return dataRow.map((v, i) => {
-        const col = cols[i] || {};
-        return `<td class="${col.p || ''} ${col.c || ''}${v===0?' z':''}">${v||'—'}</td>`;
-    }).join('');
-}
-
-function renderReport() {
-    const visibleCols = getVisibleCols();
-    const tbody = document.getElementById('reportBody');
-    tbody.innerHTML = '';
-    let grandTotal = new Array(visibleCols.length).fill(0);
-    let hasVisibleRows = false;
-    
-    Object.entries(STRUCTURE).forEach(([region, allDistricts]) => {
-        let regionTotal = new Array(visibleCols.length).fill(0);
-        let regionHasRows = false;
-        
-        // تصفية الأحياء بناءً على البحث
-        const filteredDistricts = districtFilter 
-            ? allDistricts.filter(dist => dist.includes(districtFilter))
-            : allDistricts;
-        
-        filteredDistricts.forEach(dist => {
-            const data = calcRow(dist);
-            regionTotal = sumRow(regionTotal, data);
-            regionHasRows = true;
-            hasVisibleRows = true;
-            
-            const tr = document.createElement('tr');
-            tr.className = 'tr-d';
-            tr.innerHTML = `<td class="td-n">${dist.replace('حى ','')}</td>` + cells(data);
-            tbody.appendChild(tr);
-        });
-        
-        // عرض إجمالي المنطقة فقط إذا كان هناك صفوف مرئية
-        if (regionHasRows) {
-            grandTotal = sumRow(grandTotal, regionTotal);
-            const trReg = document.createElement('tr');
-            trReg.className = 'tr-r';
-            trReg.innerHTML = `<td class="td-nr">إجمالي ${region}</td>` + cells(regionTotal);
-            tbody.appendChild(trReg);
-        }
-    });
-    
-    // عرض الإجمالي العام فقط إذا كان هناك نتائج
-    if (hasVisibleRows) {
-        const trGrand = document.createElement('tr');
-        trGrand.className = 'tr-g';
-        trGrand.innerHTML = `<td class="td-nr">الإجمالي العام</td>` + cells(grandTotal);
-        tbody.appendChild(trGrand);
-    } else {
-        tbody.innerHTML = '<tr><td colspan="100" style="text-align:center;padding:20px;color:#999">لا توجد نتائج للبحث عن "<strong>' + districtFilter + '</strong>"</td></tr>';
-    }
-    
-    document.getElementById('tableWrap').style.display = 'block';
-}
-
-let districtFilter = '';
-
-function setFilter(mode) {
-    currentFilter = mode;
-    document.querySelectorAll('.prop-btn').forEach(b => b.classList.remove('act-all','act-priv','act-govt'));
-    if (mode === 'priv') document.getElementById('btnPriv').classList.add('act-priv');
-    else if (mode === 'govt') document.getElementById('btnGovt').classList.add('act-govt');
-    else document.getElementById('btnAll').classList.add('act-all');
-    if (allRows.length > 0) {
-        buildHeader();
-        renderReport();
-    }
-}
-
-function filterByDistrict() {
-    districtFilter = document.getElementById('districtSearch').value.trim();
-    if (allRows.length > 0) {
-        buildHeader();
-        renderReport();
-    }
-}
-
-function clearDistrictFilter() {
-    document.getElementById('districtSearch').value = '';
-    districtFilter = '';
-    if (allRows.length > 0) {
-        buildHeader();
-        renderReport();
-    }
-}
-
-function exportExcel() {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.table_to_sheet(document.getElementById('reportTable'));
-    XLSX.utils.book_append_sheet(wb, ws, 'تقرير ملخص');
-    XLSX.writeFile(wb, `تقرير_ملخص_الموجة_28_${new Date().toISOString().split('T')[0]}.xlsx`);
-}
-
-function exportDetailedExcel() {
-    if (allRows.length === 0) {
-        alert('لا توجد بيانات محملة بعد');
-        return;
-    }
-    
-    // تحويل البيانات الخام إلى ورقة عمل
-    const headers = Object.keys(allRows[0]);
-    const data = [headers, ...allRows.map(row => headers.map(h => row[h] || ''))];
-    
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    
-    // تحسين عرض الأعمدة (اختياري)
-    const colWidths = headers.map(h => ({ wch: Math.max(12, h.length * 1.5) }));
-    ws['!cols'] = colWidths;
-    
-    XLSX.utils.book_append_sheet(wb, ws, 'البيانات التفصيلية');
-    XLSX.writeFile(wb, `تقرير_تفصيلي_الموجة_28_${new Date().toISOString().split('T')[0]}.xlsx`);
-}
-
-async function exportAsJPG() {
-    const tableWrap = document.getElementById('tableWrap');
-    const statusBar = document.getElementById('statusBar');
-    const originalStatus = statusBar.innerHTML;
-    
-    const elementsToHide = document.querySelectorAll('.no-jpg-export, .header, .load-panel, .filter-panel, .status-bar');
-    elementsToHide.forEach(el => el.classList.add('jpg-export-hidden'));
-    
-    tableWrap.classList.add('jpg-export-black-bold');
-    setStatus('<i class="fas fa-image"></i> جاري إنشاء الصورة...', 'loading');
-    
-    try {
-        await new Promise(r => setTimeout(r, 200));
-        const canvas = await html2canvas(tableWrap, {
-            scale: 4,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            width: tableWrap.scrollWidth,
-            height: tableWrap.scrollHeight,
-            windowWidth: tableWrap.scrollWidth,
-            windowHeight: tableWrap.scrollHeight,
-            imageTimeout: 0,
-            allowTaint: true
-        });
-        const link = document.createElement('a');
-        link.download = `تقرير_الموجة_28_${new Date().toISOString().split('T')[0]}.jpg`;
-        link.href = canvas.toDataURL('image/jpeg', 0.99);
-        link.click();
-        setStatus('<i class="fas fa-check-circle"></i> تم التصدير', 'success');
-    } catch (err) {
-        setStatus('<i class="fas fa-exclamation-triangle"></i> فشل التصدير', 'error');
-        console.error(err);
-    } finally {
-        elementsToHide.forEach(el => el.classList.remove('jpg-export-hidden'));
-        tableWrap.classList.remove('jpg-export-black-bold');
-        setTimeout(() => setStatus(originalStatus, 'info'), 1200);
-    }
-}
-
-function setStatus(html, type = 'info') {
-    const bar = document.getElementById('statusBar');
-    bar.className = `status-bar ${type}`;
-    bar.innerHTML = html;
-}
-</script>
 </body>
 </html>
